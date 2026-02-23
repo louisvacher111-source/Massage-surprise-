@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Surprise ❤️</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; background: #ffe6f0; margin:0; }
+  h1 { color: #d63384; margin-top: 20px; }
+  #container { position: relative; display: inline-block; margin-top: 30px; touch-action: none; }
+  canvas { position: absolute; left: 0; top: 0; touch-action: none; }
+  #message {
+    width: 320px; height: 180px; display: flex;
+    align-items: center; justify-content: center;
+    background: white; border-radius: 16px;
+    font-size: 22px; padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  }
+  #reveal {
+    display:none;
+    font-size: 26px;
+    margin-top: 20px;
+    color:#d63384;
+    font-weight:bold;
+  }
+</style>
+</head>
+<body>
+<h1>🎟️ Gratte ici 😏</h1>
+
+<div id="container">
+  <div id="message">
+    🎁 Bravo mon amour ❤️<br>
+    Tu as gagné :<br><br>
+    💆‍♀️ Bon pour un massage<br>
+    Valable ce soir 😘
+  </div>
+  <canvas id="scratch" width="320" height="180"></canvas>
+</div>
+
+<div id="reveal">💖 Surprise révélée 💖</div>
+
+<script>
+const canvas = document.getElementById("scratch");
+const ctx = canvas.getContext("2d");
+
+// Gray cover
+ctx.fillStyle = "#999";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+let drawing = false;
+
+// Pointer events (mouse + touch)
+canvas.addEventListener("pointerdown", () => drawing = true);
+canvas.addEventListener("pointerup", () => drawing = false);
+canvas.addEventListener("pointermove", scratch);
+
+function scratch(e) {
+  if (!drawing) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(x, y, 18, 0, Math.PI * 2);
+  ctx.fill();
+
+  checkReveal();
+}
+
+function checkReveal() {
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let cleared = 0;
+  for (let i = 3; i < pixels.data.length; i += 4) {
+    if (pixels.data[i] === 0) cleared++;
+  }
+  if (cleared > pixels.data.length / 12) {
+    document.getElementById("reveal").style.display = "block";
+  }
+}
+</script>
+
+</body>
+</html>
